@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "serve_build": "npx http-server dist/angular14-app"
   },
   "private": true,
   "dependencies": {
