@@ -1,0 +1,67 @@
+<div class="container">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h1>User Management</h1>
+    <div style="display: flex; gap: 10px;">
+      <button class="btn btn-primary" routerLink="/audit">View Audit Logs</button>
+      <button class="btn btn-secondary" (click)="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h2>Users</h2>
+      <button class="btn btn-primary" (click)="onAddUser()">Add New User</button>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-message" style="margin-bottom: 15px;">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="isLoading" style="text-align: center; padding: 20px;">
+      Loading users...
+    </div>
+
+    <table class="table" *ngIf="!isLoading && users.length > 0">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Full Name</th>
+          <th>Username</th>
+          <th>Email</th>
+          <th>Created At</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let user of users">
+          <td>{{ user.id }}</td>
+          <td>{{ user.full_name }}</td>
+          <td>{{ user.username }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.created_at | date:'short' }}</td>
+          <td>
+            <button class="btn btn-secondary" (click)="onEditUser(user)" style="margin-right: 5px;">
+              Edit
+            </button>
+            <button class="btn btn-danger" (click)="onDeleteUser(user.id)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div *ngIf="!isLoading && users.length === 0" style="text-align: center; padding: 20px;">
+      No users found. Click "Add New User" to create one.
+    </div>
+  </div>
+</div>
+
+<app-user-form
+  *ngIf="showUserForm"
+  [user]="editingUser"
+  [isEditMode]="!!editingUser"
+  (saved)="onUserSaved()"
+  (cancelled)="onUserFormCancelled()"
+></app-user-form>
+
