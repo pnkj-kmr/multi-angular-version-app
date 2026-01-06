@@ -28,7 +28,7 @@
       </div>
 
       <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage }}
+        {{ errorMessage | json }}
       </div>
 
       <button type="submit" class="btn btn-primary" [disabled]="isLoading" style="width: 100%; margin-top: 10px;">
