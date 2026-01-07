@@ -1,0 +1,19 @@
+<div class="form-input-group">
+  <label [for]="label()" class="form-label">
+    {{ label() }}
+    @if (required()) {
+      <span class="required-asterisk">*</span>
+    }
+  </label>
+  <input
+    [type]="type()"
+    [id]="label()"
+    [value]="value()"
+    [placeholder]="placeholder()"
+    [required]="required()"
+    (input)="onInput($event)"
+    class="form-input"
+  />
+</div>
+
+

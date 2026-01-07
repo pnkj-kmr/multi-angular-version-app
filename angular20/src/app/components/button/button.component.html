@@ -1,0 +1,14 @@
+<button
+  [type]="type()"
+  [disabled]="disabled() || loading()"
+  [class]="'btn btn-' + variant()"
+  class="app-button"
+>
+  @if (loading()) {
+    <span class="button-loading">Loading...</span>
+  } @else {
+    <ng-content></ng-content>
+  }
+</button>
+
+
