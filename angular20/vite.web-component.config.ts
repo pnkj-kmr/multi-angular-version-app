@@ -36,13 +36,16 @@ export default defineConfig({
         assetFileNames: "assets/[name].[ext]",
         format: "es",
         inlineDynamicImports: true,
+        manualChunks: undefined, // Don't split chunks
       },
       treeshake: false,
+      preserveEntrySignatures: "allow-extension",
     },
     commonjsOptions: {
       include: [/node_modules/],
       transformMixedEsModules: true,
     },
+    minify: true, // Disable minification for debugging
   },
   optimizeDeps: {
     include: [

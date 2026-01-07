@@ -58,7 +58,7 @@
               "styles": [],
               "scripts": [],
               "outputHashing": "none",
-              "optimization": false,
+              "optimization": true,
               "sourceMap": true,
               "extractLicenses": false
             },
@@ -72,7 +72,7 @@
               "styles": [],
               "scripts": [],
               "outputHashing": "none",
-              "optimization": false,
+              "optimization": true,
               "sourceMap": true,
               "extractLicenses": false
             }
@@ -95,3 +95,4 @@
     }
   }
 }
+
