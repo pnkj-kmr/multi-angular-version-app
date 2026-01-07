@@ -25,6 +25,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:4200",
         "http://127.0.0.1:8080",
+        "http://localhost:8080",
     ],  # Angular dev server
     allow_credentials=True,
     allow_methods=["*"],
