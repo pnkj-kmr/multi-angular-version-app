@@ -1,40 +1,16 @@
 <div class="container">
   <div class="card" style="max-width: 400px; margin: 50px auto;">
-    <h2 style="margin-bottom: 20px; text-align: center;">Login</h2>
-    
-    <form (ngSubmit)="onSubmit()">
-      <div class="form-group">
-        <label for="username">Username</label>
-        <input
-          type="text"
-          id="username"
-          [(ngModel)]="credentials.username"
-          name="username"
-          required
-          placeholder="Enter your username"
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          type="password"
-          id="password"
-          [(ngModel)]="credentials.password"
-          name="password"
-          required
-          placeholder="Enter your password"
-        />
-      </div>
-
-      <div *ngIf="errorMessage" class="error-message">
-        {{ errorMessage | json }}
-      </div>
-
-      <button type="submit" class="btn btn-primary" [disabled]="isLoading" style="width: 100%; margin-top: 10px;">
-        {{ isLoading ? 'Logging in...' : 'Login' }}
-      </button>
-    </form>
+    <!-- Using the web component from lib/login -->
+    <login-web-component
+      #loginWebComponent
+      [attr.api-url]="apiUrl"
+      [attr.login-endpoint]="loginEndpoint"
+      style="display: block;">
+    </login-web-component>
+<!-- 
+    <div *ngIf="errorMessage" class="error-message" style="margin-top: 20px; padding: 10px; background-color: #f8d7da; color: #721c24; border-radius: 4px;">
+      {{ errorMessage }}
+    </div> -->
 
     <p style="text-align: center; margin-top: 20px;">
       Don't have an account? <a routerLink="/signup" style="color: #007bff; text-decoration: none;">Sign up</a>

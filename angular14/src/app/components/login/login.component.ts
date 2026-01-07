@@ -1,69 +1,127 @@
-import { Component } from "@angular/core";
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+} from "@angular/core";
 import { Router } from "@angular/router";
 import { AuthService } from "../../services/auth.service";
-import { LoginRequest } from "../../models/user.model";
+import { environment } from "../../../environments/environment";
 
 @Component({
   selector: "app-login",
   templateUrl: "./login.component.html",
   styleUrls: ["./login.component.css"],
 })
-export class LoginComponent {
-  credentials: LoginRequest = {
-    username: "",
-    password: "",
-  };
+export class LoginComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild("loginWebComponent", { static: false })
+  loginWebComponentRef!: ElementRef<HTMLElement>;
+
+  apiUrl: string = environment.apiUrl;
+  loginEndpoint: string = "/api/auth/login";
   errorMessage: string = "";
   isLoading: boolean = false;
+  private loginSuccessHandler?: (event: any) => void;
+  private loginErrorHandler?: (event: any) => void;
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  onSubmit(): void {
-    if (!this.credentials.username || !this.credentials.password) {
-      this.errorMessage = "Please fill in all fields";
+  ngOnInit(): void {
+    // Wait for custom element to be defined
+    this.waitForCustomElement();
+  }
+
+  ngAfterViewInit(): void {
+    // Set up event listeners and configure web component after view is initialized
+    setTimeout(() => {
+      this.configureWebComponent();
+      this.setupEventListeners();
+    }, 100);
+  }
+
+  private configureWebComponent(): void {
+    const element = this.loginWebComponentRef?.nativeElement as any;
+    if (!element) return;
+
+    // Set properties on the web component
+    if (element.apiUrl !== undefined) {
+      element.apiUrl = this.apiUrl;
+    }
+    if (element.loginEndpoint !== undefined) {
+      element.loginEndpoint = this.loginEndpoint;
+    }
+
+    // Also set as attributes (for compatibility)
+    if (this.apiUrl) {
+      element.setAttribute("api-url", this.apiUrl);
+    }
+    if (this.loginEndpoint) {
+      element.setAttribute("login-endpoint", this.loginEndpoint);
+    }
+  }
+
+  ngOnDestroy(): void {
+    // Clean up event listeners
+    this.removeEventListeners();
+  }
+
+  private waitForCustomElement(): void {
+    if (customElements.get("login-web-component")) {
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = "";
+    // Wait for custom element to be defined
+    const checkInterval = setInterval(() => {
+      if (customElements.get("login-web-component")) {
+        clearInterval(checkInterval);
+        this.setupEventListeners();
+      }
+    }, 100);
 
-    this.authService.login(this.credentials).subscribe({
-      next: () => {
+    // Timeout after 5 seconds
+    setTimeout(() => {
+      clearInterval(checkInterval);
+    }, 5000);
+  }
+
+  private setupEventListeners(): void {
+    const element = this.loginWebComponentRef?.nativeElement;
+    if (!element) return;
+
+    // Handle login success
+    this.loginSuccessHandler = (event: CustomEvent) => {
+      const response = event.detail;
+      // Store token if not already stored
+      if (response?.access_token) {
+        localStorage.setItem("token", response.access_token);
+        // Update auth service state
+        (this.authService as any).token?.set(response.access_token);
+        // Navigate to home
         this.router.navigate(["/home"]);
-      },
-      error: (error) => {
-        this.isLoading = false;
-        // Handle FastAPI validation errors (422 status)
-        if (
-          error.status === 422 &&
-          error.error?.detail &&
-          Array.isArray(error.error.detail)
-        ) {
-          // Extract validation error messages
-          const errorMessages = error.error.detail.map((err: any) => {
-            const field =
-              err.loc && err.loc.length > 1
-                ? err.loc[err.loc.length - 1]
-                : "field";
-            return `${field}: ${err.msg}`;
-          });
-          this.errorMessage = errorMessages.join(", ");
-        } else if (error.error?.detail) {
-          // Handle other error formats
-          if (typeof error.error.detail === "string") {
-            this.errorMessage = error.error.detail;
-          } else if (
-            Array.isArray(error.error.detail) &&
-            error.error.detail.length > 0
-          ) {
-            this.errorMessage = error.error.detail[0].msg || "Validation error";
-          } else {
-            this.errorMessage = "Login failed. Please try again.";
-          }
-        } else {
-          this.errorMessage = "Login failed. Please try again.";
-        }
-      },
-    });
+      }
+    };
+
+    // Handle login error
+    this.loginErrorHandler = (event: CustomEvent) => {
+      this.errorMessage = event.detail || "Login failed. Please try again.";
+      this.isLoading = false;
+    };
+
+    element.addEventListener("loginSuccess", this.loginSuccessHandler);
+    element.addEventListener("loginError", this.loginErrorHandler);
+  }
+
+  private removeEventListeners(): void {
+    const element = this.loginWebComponentRef?.nativeElement;
+    if (!element) return;
+
+    if (this.loginSuccessHandler) {
+      element.removeEventListener("loginSuccess", this.loginSuccessHandler);
+    }
+    if (this.loginErrorHandler) {
+      element.removeEventListener("loginError", this.loginErrorHandler);
+    }
   }
 }
