@@ -1,16 +1,54 @@
-<div class="container">
-  <div class="card" style="max-width: 400px; margin: 50px auto;">
-    <!-- Using the web component from lib/login -->
-    <login-web-component
-      #loginWebComponent
-      [attr.api-url]="apiUrl"
-      [attr.login-endpoint]="loginEndpoint"
-      style="display: block;">
-    </login-web-component>
+<div class="login-page">
+  <div class="login-container">
+    <div class="login-card">
+      <h2 class="login-title">Angular 14 Login</h2>
+      
+      <form (ngSubmit)="onSubmit()" class="login-form">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [(ngModel)]="credentials.username"
+            placeholder="Enter your username"
+            required
+            class="form-control"
+          />
+        </div>
 
-    <p style="text-align: center; margin-top: 20px;">
-      Don't have an account? <a routerLink="/auth/signup" style="color: #007bff; text-decoration: none;">Sign up</a>
-    </p>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [(ngModel)]="credentials.password"
+            placeholder="Enter your password"
+            required
+            class="form-control"
+          />
+        </div>
+
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="isLoading">Logging in...</span>
+          <span *ngIf="!isLoading">Login</span>
+        </button>
+      </form>
+
+      <p class="login-footer">
+        Don't have an account?
+        <a routerLink="/auth/signup" class="login-link">Sign up</a>
+      </p>
+    </div>
   </div>
 </div>
 
